@@ -9,8 +9,8 @@ router.post("/posts", passport.authenticate("jwt", { session: false }), BlogCont
 router.put("/posts/:postId", passport.authenticate("jwt", { session: false }), BlogController.editPost);
 router.delete("/posts/:postId", passport.authenticate("jwt", { session: false }), BlogController.deletePost);
 
-router.get("/posts/:postId/comments");
-router.post("/posts/:postId/comments");
+router.get("/posts/:postId/comments", BlogController.getComments);
+router.post("/posts/:postId/comments", passport.authenticate("jwt", { session: false }), BlogController.createComment);
 
 router.post("/auth/login");
 router.post("/auth/register");

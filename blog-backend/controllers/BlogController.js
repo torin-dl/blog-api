@@ -3,13 +3,18 @@ import passport from "../config/passport.js";
 import { prisma } from "../lib/prisma.js";
 
 async function getPosts(req, res) {
-    const posts = await prisma.post.findMany({
-        include: {
-            user: true,
-            comments: true,
-        },
-    });
-    res.json(posts);
+    try {
+        const posts = await prisma.post.findMany({
+            include: {
+                user: true,
+                comments: true,
+            },
+        });
+        res.status(201).json(posts);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
 }
 
 async function createPost(req, res, next) {
@@ -57,9 +62,43 @@ async function deletePost(req, res, next) {
     }
 }
 
+async function getComments(req, res, next) {
+    try {
+        const comments = await prisma.comment.findMany({
+            where: { postId: parseInt(req.params.id) },
+            include: {
+                user: true,
+                post: false,
+            },
+        });
+        res.status(201).json(comments);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+
+async function createComment(req, res, next) {
+    try {
+        const comment = await prisma.comment.create({
+            data: {
+                body: req.body.body,
+                userId: req.user.id,
+                postId: parseInt(req.params.id),
+            },
+        });
+        res.status(201).json(comment);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+
 export default {
     getPosts,
     createPost,
     editPost,
     deletePost,
+    getComments,
+    createComment,
 };
