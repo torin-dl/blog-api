@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import BlogController from "../controllers/BlogController";
+import BlogController from "../controllers/BlogController.js";
 
 const router = Router();
 
@@ -12,6 +12,8 @@ router.delete("/posts/:postId", passport.authenticate("jwt", { session: false })
 router.get("/posts/:postId/comments", BlogController.getComments);
 router.post("/posts/:postId/comments", passport.authenticate("jwt", { session: false }), BlogController.createComment);
 
-router.post("/auth/login");
-router.post("/auth/register");
-router.get("/auth/logout");
+router.post("/auth/log-in", BlogController.logIn);
+router.post("/auth/sign-up", BlogController.signUp);
+router.get("/auth/log-out", BlogController.logOut);
+
+export default router;

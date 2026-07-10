@@ -1,11 +1,13 @@
 import passport from "passport";
-import { JwtStrategy } from "passport-jwt";
-import { ExtractJwt } from "passport-jwt";
-import { prisma } from "../lib/prisma";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import { prisma } from "../lib/prisma.js";
+import { Strategy as LocalStrategy } from "passport-local";
+import bcrypt from "bcrypt";
+import "dotenv/config";
 
 const options = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: "cerulean",
+    secretOrKey: process.env.SECRETKEY,
 };
 
 passport.use(
@@ -27,3 +29,28 @@ passport.use(
         }
     }),
 );
+
+passport.use(
+    new LocalStrategy(async (username, password, done) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    username: username,
+                },
+            });
+            const match = await bcrypt.compare(password, user.password);
+
+            if (!user) {
+                return done(null, false, { message: "Incorrect username" });
+            }
+            if (!match) {
+                return done(null, false, { message: "Incorrect password" });
+            }
+            return done(null, user);
+        } catch (err) {
+            return done(err);
+        }
+    }),
+);
+
+export default passport;

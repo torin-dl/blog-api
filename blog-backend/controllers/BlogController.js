@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import passport from "../config/passport.js";
+import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
+import "dotenv/config";
 
 async function getPosts(req, res) {
     try {
@@ -94,6 +96,41 @@ async function createComment(req, res, next) {
     }
 }
 
+async function signUp(req, res, next) {
+    try {
+        const username = req.body.username;
+        const password = await bcrypt.hash(req.body.password, 10);
+        const user = await prisma.user.create({
+            data: {
+                username,
+                password,
+            },
+        });
+
+        const payload = { id: user.id, username: user.username, role: user.role };
+        const token = jwt.sign(payload, process.env.SECRETKEY, { expiresIn: "1h" });
+        res.json({ success: true, token: "Bearer " + token });
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+}
+
+async function logIn(req, res, next) {
+    passport.authenticate("local", { session: false }, (err, user, info) => {
+        if (err) return next(err);
+        if (!user) return res.status(401).json({ error: info.message || "Invalid credentials" });
+
+        const payload = { id: user.id, username: user.username, role: user.role };
+        const token = jwt.sign(payload, process.env.SECRETKEY, { expiresIn: "1h" });
+        res.json({ success: true, token: "Bearer " + token });
+    })(req, res, next);
+}
+
+function logOut(req, res, next) {
+    res.status(200).json({ success: true, message: "Logout successful" });
+}
+
 export default {
     getPosts,
     createPost,
@@ -101,4 +138,7 @@ export default {
     deletePost,
     getComments,
     createComment,
+    signUp,
+    logIn,
+    logOut,
 };
