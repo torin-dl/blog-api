@@ -20,6 +20,9 @@ async function getPosts(req, res) {
 }
 
 async function createPost(req, res, next) {
+    if (req.user.role !== "ADMIN") {
+        return res.status(403).json({ error: "unauthorized" });
+    }
     try {
         const post = await prisma.post.create({
             data: {
@@ -37,9 +40,12 @@ async function createPost(req, res, next) {
 }
 
 async function editPost(req, res, next) {
+    if (req.user.role !== "ADMIN") {
+        return res.status(403).json({ error: "unauthorized" });
+    }
     try {
         const post = await prisma.post.update({
-            where: { id: parseInt(req.params.id) },
+            where: { id: parseInt(req.params.postId) },
             data: {
                 title: req.body.title,
                 body: req.body.body,
@@ -53,9 +59,12 @@ async function editPost(req, res, next) {
 }
 
 async function deletePost(req, res, next) {
+    if (req.user.role !== "ADMIN") {
+        return res.status(403).json({ error: "unauthorized" });
+    }
     try {
         await prisma.post.delete({
-            where: { id: parseInt(req.params.id) },
+            where: { id: parseInt(req.params.postId) },
         });
         res.status(204).send();
     } catch (error) {
@@ -67,7 +76,7 @@ async function deletePost(req, res, next) {
 async function getComments(req, res, next) {
     try {
         const comments = await prisma.comment.findMany({
-            where: { postId: parseInt(req.params.id) },
+            where: { postId: parseInt(req.params.postId) },
             include: {
                 user: true,
                 post: false,
@@ -86,7 +95,7 @@ async function createComment(req, res, next) {
             data: {
                 body: req.body.body,
                 userId: req.user.id,
-                postId: parseInt(req.params.id),
+                postId: parseInt(req.params.postId),
             },
         });
         res.status(201).json(comment);

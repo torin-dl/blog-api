@@ -1,2 +1,4 @@
 /generated/prisma
 populatedb.js
+.postman/**
+postman/**
