@@ -17,10 +17,11 @@ const useFetchPosts = () => {
                 }
                 const data = await response.json()
                 setPosts(data)
-                setLoading(data)
             } catch (err) {
                 console.log(err)
                 setError(err.message)
+            } finally {
+                setLoading(false)
             }
         }
         fetchPosts()
