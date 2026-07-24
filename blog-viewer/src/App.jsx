@@ -1,8 +1,6 @@
 import { Outlet } from 'react-router-dom'
 function App() {
 
-  // auth hook with wrapper, auth components
-  // card components
   return (
     <div className='main-container'>
       <Outlet />

@@ -1,16 +1,17 @@
 import { useAuth } from '../hooks/authContext';
 import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
 
 function Login() {
-    const [username, setUsername] = setState('');
-    const [password, setPassword] = setState('')
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('')
 
     const { login } = useAuth()
     const navigate = useNavigate()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('/api/log-in', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/log-in`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -18,7 +19,7 @@ function Login() {
 
         const data = await response.json();
         if (!response.ok) {
-            setError(data.error)
+            console.log(data.error)
             return;
         }
         login(data.token);

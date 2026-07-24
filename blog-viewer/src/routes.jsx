@@ -1,4 +1,6 @@
+import App from './App'
 import Home from './components/Home'
+import Login from './components/Login'
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/authContext'
 
@@ -16,9 +18,6 @@ const routes = [
             { path: 'login', element: <Login /> },
             {
                 element: <ProtectedRoute />,
-                children: [
-                    { path: 'new-comment', element: <NewComment /> },
-                ]
             }
         ]
     }

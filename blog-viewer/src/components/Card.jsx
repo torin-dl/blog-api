@@ -1,4 +1,9 @@
-function Card({ post }) {
+import { useState } from 'react'
+import NewComment from './NewComment'
+
+function Card({ post, refetch }) {
+    const [editing, setEditing] = useState(false)
+
     return (
         <div className="card">
             <div className="post">
@@ -13,6 +18,11 @@ function Card({ post }) {
                         <p>{comment.body}</p>
                     </div>
                 ) : null}
+            </div>
+            <div className="add-comment">
+                {editing ? <NewComment postId={post.id} onDone={() => { setEditing(false) }} refetch={refetch} />
+                    : <button onClick={() => setEditing(true)}>Add Comment</button>
+                }
             </div>
         </div>
     )
